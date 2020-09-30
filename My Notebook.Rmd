@@ -1,0 +1,49 @@
+---
+title: "Quanteda Course 30th September - 2nd October"
+output: html_notebook
+---
+
+Lectured by: Kenneth Benoit & Stefan Müller
+Hosted by: SFB & BIGSSS
+Date: 30th September - 2nd October
+
+
+# Day one
+
+```{r libaries}
+rm(list=ls())
+
+# devtools::install_github("quanteda/quanteda.corpora")
+pacman::p_load("quanteda", "quanteda.textmodels", "readtext", "spacyr", "quanteda.corpora")
+
+```
+
+
+sparse: percentage of cells with value "0".
+
+```{r import}
+dat <- readtext(file = "inaugural_germany/*",
+                docvarsfrom = "filenames",
+                dvsep = "-",
+                encoding = "utf-8",
+                docvarnames = c("Year", "Name", "Party"))
+
+
+data_corpus_inaugural_de <- corpus(dat)
+```
+
+
+```{r toks&dfm}
+dfm1 <- data_corpus_inaugural_de %>%
+  tokens(remove_punct = TRUE) %>%
+  tokens_remove(stopwords("de")) %>%
+  dfm()
+
+
+toks_char <- tokens(data_corpus_inaugural_de, what = "character")
+
+dfmat_char <- dfm(toks_char)
+
+topfeatures(dfmat_char, n = 100)
+```
+

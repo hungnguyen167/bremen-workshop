@@ -13,6 +13,7 @@ knitr::opts_chunk$set(
 
 ```{r}
 library("quanteda")
+pacman::p_author(quanteda)
 ```
 
 ## Using **magrittr**'s pipe
@@ -28,7 +29,14 @@ data_corpus_inaugural %>%
 Add a step to the above to convert the documents in the corpus into sentences.  Hint: Insert a step calling `corpus_reshape()`.
 
 ```{r}
+data_corpus_inaugural %>% 
+    corpus_subset(President == "Obama") %>% 
+    corpus_reshape(to = "sentences") %>%
+    ndoc()
 
+
+corpus_segment(data_corpus_inaugural, pattern = ":* ") %>%
+  head()
 ```
 
 ## Access number of types and tokens of corpus
@@ -54,13 +62,17 @@ head(docvars(data_corpus_inaugural))
 1. Based on `data_corpus_inaugural`, create an object `data_corpus_postwar` (speeches since 1945).
 
 ```{r}
+data_corpus_postwar <- data_corpus_inaugural %>% 
+    corpus_subset(Year > 1945)
 
 ```
 
 2. What speech has most tokens? What speech has most types?
 
 ```{r}
-
+ntoken(data_corpus_inaugural) %>%
+  sort(decreasing = TRUE) %>%
+  head(n=3)
 ```
 
 Note: You can find the documentation and examples using `?` followed by the name of the function.
@@ -88,19 +100,38 @@ head(docvars(data_corpus_inaugural))
 1. See `?docvars`.  Is there another way to add docvars, using an operator?  Can you reproduce the code above using that method?
 
 ```{r}
-
+data_corpus_inaugural$FIRSTNAME <- char_toupper(data_corpus_inaugural$FirstName)
 ```
 
 2. Tokenize the corpus object to which you have added docvars. Are the docvars still in the tokens object?
 
 ```{r}
+data_tokens_inaugural <- data_corpus_inaugural %>% 
+    tokens(remove_punct = TRUE, include_docvars = TRUE) %>%
+    tokens_remove(stopwords("en"))
 
+docvars(data_tokens_inaugural) %>%
+    head(3)
 ```
 
 3. Make a dfm from the corpus object.  Are the docvars still in the dfm object?
 
 ```{r}
+data_dfm_inaugural <- data_corpus_inaugural %>% 
+    tokens(remove_punct = TRUE, include_docvars = TRUE) %>%
+    tokens_remove(stopwords("en")) %>%
+    dfm()
+docvars(data_dfm_inaugural) %>%
+    head(3)
 
 ```
 
+4. Corpus level information
+
+```{r}
+meta(data_corpus_inaugural)
+
+meta(data_corpus_inaugural, "info") <- "Nice!"
+
+```
 
